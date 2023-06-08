@@ -1,0 +1,83 @@
+{% extends 'base.j2' %}
+
+{% block content %}
+<div class="card m-3">
+    <div class="card-header">
+        Add a Driver
+    </div>
+
+    <div class="card-body">
+        <form method="post" action="/drivers">
+            <div class="form-group">
+                <label for="license_plate">License Plate:</label>
+                <input type="text" class="form-control" id="license_plate" name="license_plate" required>
+            </div>
+            <div class="form-group">
+                <label for="place">Place:</label>
+                <input type="text" class="form-control" id="place" name="place" required>
+            </div>
+            <div class="form-group">
+                <label for="time">Time:</label>
+                <input type="datetime-local" class="form-control" id="time" name="time" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <input type="text" class="form-control" id="description" name="description" required>
+            </div>
+            <div class="form-group">
+                <label for="video">Video:</label>
+                <input type="text" class="form-control" id="video" name="video">
+            </div>
+            <div class="form-group">
+                <label for="city">City:</label>
+                <select class="form-control" id="city" name="city" required>
+                    {% for city in cities %}
+                    <option>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="card m-3">
+    <div class="card-header">
+        Random Driver in city
+    </div>
+
+    <div class="card-body">
+        <form method="get" action="/drivers/random">
+            <div class="form-group">
+                <label for="city">City:</label>
+                <select class="form-control" id="city" name="city" required>
+                    {% for city in cities %}
+                    <option>{{ city }}</option>
+                    {% endfor %}<div class="card">
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Get</button>
+        </form>
+    </div>
+</div>
+
+<div class="card m-3">
+    <div class="card-header">
+        View Bad Drivers for city
+    </div>
+
+    <div class="card-body">
+        <form method="get" action="/drivers">
+            <div class="form-group">
+                <label for="city">City:</label>
+                <select class="form-control" id="city" name="city" required>
+                    {% for city in cities %}
+                    <option>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Get</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
+    <title>Bad Drivers</title>
+</head>
+
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="#">Bad Drivers</a>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" :class="{ active: activeTab === 'addDriver' }"
+                            @click="changeTab('addDriver')" href="#">Add Driver</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" :class="{ active: activeTab === 'getDrivers' }"
+                            @click="changeTab('getDrivers')" href="#">Get Drivers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" :class="{ active: activeTab === 'randomDriver' }"
+                            @click="changeTab('randomDriver')" href="#">Random Driver</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <div v-if="activeTab === 'addDriver'" class="card">
+                <div class="card-header">Add Driver</div>
+                <div class="card-body">
+                    <form @submit.prevent="addDriver">
+                        <div class="mb-3">
+                            <label for="licensePlate" class="form-label">License Plate</label>
+                            <input type="text" class="form-control" id="licensePlate" v-model="driver.licensePlate"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="place" class="form-label">Place</label>
+                            <input type="text" class="form-control" id="place" v-model="driver.place" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time</label>
+                            <input type="datetime-local" class="form-control" id="time" v-model="driver.time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" v-model="driver.description"
+                                required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="video" class="form-label">Video</label>
+                            <input type="text" class="form-control" id="video" v-model="driver.video">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <city-picker v-model="driver.city"></city-picker>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+            <div v-if="activeTab === 'getDrivers'" class="card">
+                <div class="card-header">Get Drivers</div>
+                <div class="card-body">
+                    <form @submit.prevent="getDrivers">
+                        <div class="mb-3">
+                            <label for="getCity" class="form-label">City</label>
+                            <city-picker v-model="getDriversCity"></city-picker>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Get Drivers</button>
+                    </form>
+                    <div v-if="drivers.length > 0">
+                        <h5 class="mt-4">Drivers:</h5>
+                        <ul>
+                            <li v-for="driver in drivers" :key="driver.id">{{ driver.license_plate }} - {{
+                                driver.description }}</li>
+                        </ul>
+                    </div>
+                    <div v-else-if="getDriversError">
+                        <p class="text-danger">{{ getDriversError }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="activeTab === 'randomDriver'" class="card">
+                <div class="card-header">Random Driver</div>
+                <div class="card-body">
+                    <form @submit.prevent="getRandomDriver">
+                        <div class="mb-3">
+                            <label for="randomCity" class="form-label">City</label>
+                            <city-picker v-model="getRandomDriverCity"></city-picker>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Get Random Driver</button>
+                    </form>
+                    <div v-if="randomDriver">
+                        <h5 class="mt-4">Random Driver:</h5>
+                        <p>{{ randomDriver.license_plate }} - {{ randomDriver.description }}</p>
+                    </div>
+                    <div v-else-if="getRandomDriverError">
+                        <p class="text-danger">{{ getRandomDriverError }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        Vue.component('city-picker', {
+            template: `
+        <select name='city' class="form-control" v-model="selectedCity">
+          <option v-for="city in cities" :value=" city.name + ' ' + city.state">{{ city.name }}, {{ city.state }}</option>
+        </select>
+      `,
+            props: ['value'],
+            data() {
+                return {
+                    selectedCity: this.value,
+                    cities: []
+                };
+            },
+            mounted() {
+                this.loadCities();
+            },
+            watch: {
+                value(newVal) {
+                    console.log(newVal);
+                    this.selectedCity = newVal;
+                }
+            },
+            methods: {
+                loadCities() {
+                    axios.get('https://cdn.jsdelivr.net/gh/nshntarora/Indian-Cities-JSON/cities.json')
+                        .then(response => {
+                            this.cities = response.data;
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                }
+            }
+        });
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                activeTab: 'addDriver',
+                driver: {
+                    licensePlate: '',
+                    place: '',
+                    time: '',
+                    description: '',
+                    video: '',
+                    city: ''
+                },
+                getDriversCity: '',
+                drivers: [],
+                getDriversError: '',
+                getRandomDriverCity: '',
+                randomDriver: null,
+                getRandomDriverError: ''
+            },
+            methods: {
+                changeTab(tabName) {
+                    this.activeTab = tabName;
+                },
+                addDriver() {
+                    axios.post('/drivers', this.driver)
+                        .then(response => {
+                            alert(response.data.message);
+                            /* this.driver = {
+                                licensePlate: '',
+                                place: '',
+                                time: '',
+                                description: '',
+                                video: '',
+                                city: ''
+                            }; */
+                        })
+                        .catch(error => {
+                            alert('Failed to add driver');
+                            console.error(error);
+                        });
+                },
+                getDrivers() {
+                    axios.get(`/drivers?city=${this.getDriversCity}`)
+                        .then(response => {
+                            this.drivers = response.data.drivers;
+                            this.getDriversError = '';
+                        })
+                        .catch(error => {
+                            this.getDriversError = error.response.data.detail;
+                            this.drivers = [];
+                            console.error(error);
+                        });
+                },
+                getRandomDriver() {
+                    axios.get(`/random-driver?city=${this.getRandomDriverCity}`)
+                        .then(response => {
+                            this.randomDriver = response.data.random_driver;
+                            this.getRandomDriverError = '';
+                        })
+                        .catch(error => {
+                            this.getRandomDriverError = error.response.data.detail;
+                            this.randomDriver = null;
+                            console.error(error);
+                        });
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+{% extends 'base.j2' %}
+
+{% block content %}
+<div class="alert alert-danger mt-4" role="alert">
+    <h4 class="alert-heading">Error</h4>
+    <p class="mb-0">The following error occurred processing your request:</p>
+    <p>{{ error }}</p>
+</div>
+{% endblock %}
