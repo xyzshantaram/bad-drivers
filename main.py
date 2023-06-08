@@ -1,7 +1,6 @@
 import sqlite3
 import requests
-from flask import Flask, render_template, request, redirect, url_for, current_app, Blueprint
-from random import choice
+from flask import Flask, render_template, request, redirect, url_for
 import itertools
 
 def create_app():
@@ -82,10 +81,11 @@ def create_app():
         if not validate_city(city):
             return render_template('error.j2', error='Invalid city')
 
-        c.execute("SELECT * FROM drivers WHERE city=?", (city,))
+        c.execute("SELECT license_plate, city, description, video, place, time FROM drivers WHERE city=?", (city,))
         drivers_list = c.fetchall()
         c.close()
         conn.close()
+        print(drivers_list)
         return render_template('drivers.j2', drivers=drivers_list, city=city)
 
     # Show a random driver from a city
@@ -97,12 +97,8 @@ def create_app():
         if not validate_city(city):
             return render_template('error.j2', error='Invalid city')
 
-        c.execute("SELECT * FROM drivers WHERE city=?", (city,))
-        drivers_list = c.fetchall()
-        if len(drivers_list) == 0:
-            return render_template('error.j2', error='No drivers found for this city')
-
-        driver = choice(drivers_list)
+        c.execute("SELECT license_plate, city, description, video, place, time FROM drivers WHERE city=? order by random() limit 1;", (city,))
+        driver = c.fetchone()
         c.close()
         conn.close()
         return render_template('random.j2', driver=driver, city=city)

@@ -8,10 +8,14 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">{{ driver[0] }}</h5>
-                <p class="card-text"><strong>Place:</strong> {{ driver[1] }}</p>
-                <p class="card-text"><strong>Time:</strong> {{ driver[2] }}</p>
-                <p class="card-text"><strong>Description:</strong> {{ driver[3] }}</p>
-                <p class="card-text"><strong>City:</strong> {{ driver[5] }}</p>
+                <p class="card-text"><strong>in</strong> {{ driver[4] }}</p>
+                <p class="card-text">{{ driver[2] }}</p>
+                <p class="card-text"><strong>at</strong> {{ driver[5] }}</p>
+                {% if driver[3] | length %}
+                <p class="card-text">
+                    <a href="{{ driver[3] }}">Video link</a>
+                </p>
+                {% endif %}
             </div>
         </div>
     </div>
