@@ -35,11 +35,9 @@ def create_app():
         s = list(sorted(c, key=lambda x: x['name']))
         for city in s:
             cities_names.append(f"{city['name']}, {city['state']}")
-    print(cities_names)
 
     # Helper function to validate if a city is in the cities list
     def validate_city(city):
-        print(city, city in cities_names)
         return city in cities_names
 
     # Index route - show form to add a driver
@@ -57,7 +55,6 @@ def create_app():
         time = request.form['time']
         description = request.form['description']
         video = request.form['video']
-        print(request.form)
         city = request.form['city']
 
         if not validate_city(city):
@@ -85,7 +82,6 @@ def create_app():
         drivers_list = c.fetchall()
         c.close()
         conn.close()
-        print(drivers_list)
         return render_template('drivers.j2', drivers=drivers_list, city=city)
 
     # Show a random driver from a city
